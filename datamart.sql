@@ -29,7 +29,7 @@ CREATE TABLE promotions(
 );
 
 CREATE TABLE times(
-    "order_date" DATE NOT NULL,
+    "order_date" VARCHAR2(20) NOT NULL,
     "year_actual" NUMERIC,
     "quarter_name" VARCHAR2(40),
     "month_name" VARCHAR2(40),
@@ -56,7 +56,7 @@ CREATE TABLE sales(
     "channel_id" INT NOT NULL,
     "promotion_id" INT NOT NULL,
     "city_id" INT NOT NULL,
-    "order_date" DATE NOT NULL,
+    "order_date" VARCHAR2(20) NOT NULL,
     "quantity" NUMERIC(10,2) NOT NULL,
     "amount" NUMERIC(10,2) NOT NULL,
     "cost" INT NOT NULL,
@@ -101,7 +101,7 @@ LEFT JOIN regions r ON cn.region_id = r.id
 LEFT JOIN regions rg ON r.id = rg.id;
 
 /*Table Times*/
-SELECT DISTINCT oi.order_date,
+SELECT DISTINCT oi.order_date::TEXT,
 EXTRACT(year FROM oi.order_date) AS year_actual,
 CASE
            WHEN EXTRACT(quarter FROM oi.order_date) = 1 THEN 'First'
@@ -116,8 +116,9 @@ FROM order_items oi
 INNER JOIN orders o ON o.id = oi.order_id;
 
 /*Facts Table Sales*/
-SELECT o.id AS order_id, oi.product_id, c.id AS channel_id, o.promotion_id, a.city_id, oi.order_date, oi.quantity, oi.amount, oi.cost
+SELECT o.id AS order_id, oi.product_id, c.id AS channel_id, o.promotion_id, a.city_id, oi.order_date::TEXT, oi.quantity, oi.amount, oi.cost
 FROM orders o
 INNER JOIN order_items oi ON o.id = oi.order_id
 LEFT JOIN channels c ON c.name = o.channel
 LEFT JOIN addresses a ON a.customer_id = o.customer_id;
+
